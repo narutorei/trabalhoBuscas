@@ -2,7 +2,7 @@
 * @Author: reinaldo
 * @Date:   2014-09-16 23:26:37
 * @Last Modified by:   Reinaldo Antonio Camargo Rauch
-* @Last Modified time: 2014-09-17 01:47:53
+* @Last Modified time: 2014-09-17 14:41:31
 */
 
 #include <stdio.h>
@@ -10,8 +10,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define TAM 100000
-#define SEARCH_REPEAT 1
+#define TAM 10000
+#define SEARCH_REPEAT 50
 
 /**
  * Struct da árvore AVL
@@ -37,7 +37,7 @@ int array[TAM], tamHeap;
 /**
  * Variáveis para contagem de comparações
  */
-int sequentialCount = 0, binCount = 0, binTreeCount = 0, avlCount = 0;
+long int sequentialCount = 0, binCount = 0, binTreeCount = 0, avlCount = 0;
 
 /**
  * Raiz da árvore AVL
@@ -123,10 +123,10 @@ void balanced_insert(int key)
 
     /* Insere key e descobre ancestral mais jovem a ser desbalanceado */
     while (p != NULL) {
-        if (key > p->value)
-            q = p->dir;
-        else
+        if (key < p->value)
             q = p->esq;
+        else
+            q = p->dir;
 
         if (q != NULL)
             if (q->bal != 0) {
@@ -141,9 +141,9 @@ void balanced_insert(int key)
     q = create_node(key);
 
     if (key < pp->value)
-        pp->esq=q;
+        pp->esq = q;
     else
-        pp->dir=q;
+        pp->dir = q;
 
     /* Balanceamento de todos os nós entre ajovem e q devem ser ajustados */
     if (key < ajovem->value)
@@ -369,6 +369,20 @@ void generateValues() {
 
 }
 
+/**
+ * Imprime o array
+ */
+void printArray(){
+
+    int i;
+
+    putchar('\n');
+    for (i = 0; i < TAM; i++)
+        printf(" - %10d\n", array[i]);
+    putchar('\n');
+
+}
+
 // Funções de busca
 
 /**
@@ -380,7 +394,7 @@ int sequentialSearch(int key) {
 
     int i;
 
-    for (i = 0; i < TAM; i++) {
+    for (i = 0; i < TAM && array[i] <= key; i++) {
         sequentialCount++;
         if(array[i] == key)
             return i;
@@ -424,7 +438,7 @@ int binSearch(int val) {
  * @param  root raiz da árvore em que val será procurada
  * @return     NULL se não foi encontrado, t_node se sim
  */
-t_node *search(int val, t_node *root, int *count) {
+t_node *search(int val, t_node *root, long int *count) {
 
     t_node *here = root;
 
@@ -450,7 +464,7 @@ t_node *search(int val, t_node *root, int *count) {
  */
 int main() {
 
-    int searchKey, i, j, seqSum = 0, binSum = 0, binTreeSum = 0, avlSum = 0;
+    long int searchKey, i, j, seqSum = 0, binSum = 0, binTreeSum = 0, avlSum = 0;
 
     srand(time(NULL));
 
@@ -459,6 +473,8 @@ int main() {
         sequentialCount = binCount = binTreeCount = avlCount = 0;
 
         generateValues();
+
+        root_bin_tree = root_avl = NULL;
 
         for (j = 0; j < TAM; j++) {
             balanced_insert(array[j]);
@@ -489,10 +505,10 @@ int main() {
     }
 
     printf("Média de comparações com %d repetições e %d elementos: \n", SEARCH_REPEAT, TAM);
-    printf("Busca sequêncial:        %10.2f, com %d comparações;\n", (float) seqSum / (float) SEARCH_REPEAT, seqSum);
-    printf("Busca binária:           %10.2f, com %d comparações;\n", (float) binSum / (float) SEARCH_REPEAT, binSum);
-    printf("Busca em árvore binária: %10.2f, com %d comparações;\n", (float) binTreeSum / (float) SEARCH_REPEAT, binTreeSum);
-    printf("Busca em árvore AVL:     %10.2f, com %d comparações;\n", (float) avlSum / (float) SEARCH_REPEAT, avlSum);
+    printf("Busca sequêncial:        %10.2f, com %ld comparações;\n", (float) seqSum / (float) SEARCH_REPEAT, seqSum);
+    printf("Busca binária:           %10.2f, com %ld comparações;\n", (float) binSum / (float) SEARCH_REPEAT, binSum);
+    printf("Busca em árvore binária: %10.2f, com %ld comparações;\n", (float) binTreeSum / (float) SEARCH_REPEAT, binTreeSum);
+    printf("Busca em árvore AVL:     %10.2f, com %ld comparações;\n", (float) avlSum / (float) SEARCH_REPEAT, avlSum);
 
     return 0;
 
